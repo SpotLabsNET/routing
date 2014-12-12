@@ -6,7 +6,7 @@
  * Also handles #hash arguments.
  * Should handle absolute arguments OK.
  */
-function url_for($module, $arguments = array()) {
+function url_for_old($module, $arguments = array()) {
   if (!is_array($arguments)) {
     throw new \InvalidArgumentException("Expected arguments to be an array, was " . gettype($arguments));
   }
@@ -27,6 +27,10 @@ function url_for($module, $arguments = array()) {
     }
   }
   return ($is_absolute ? "" : calculate_relative_path()) . $module . /* ".php" . */ (count($query) ? "?" . implode("&", $query) : "") . ($hash ? "#" . $hash : "");
+}
+
+function url_for($module, $arguments = array()) {
+  return \Openclerk\Router::urlFor($module, $arguments);
 }
 
 /**

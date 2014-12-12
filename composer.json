@@ -3,6 +3,9 @@
   "require": {
     "openclerk/config": "dev-master"
   },
+  "requireDev": {
+    "phpunit/phpunit": "4.0"
+  },
   "autoload": {
     "files": ["functions.php"],
     "psr-4": {
