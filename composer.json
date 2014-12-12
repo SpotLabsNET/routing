@@ -3,7 +3,7 @@
   "require": {
     "openclerk/config": "dev-master"
   },
-  "requireDev": {
+  "require-dev": {
     "phpunit/phpunit": "4.0"
   },
   "autoload": {
@@ -11,5 +11,9 @@
     "psr-4": {
       "Openclerk\\": "src"
     }
-  }
+  },
+  "repositories": [{
+    "type": "vcs",
+    "url": "https://github.com/openclerk/config"
+  }]
 }
