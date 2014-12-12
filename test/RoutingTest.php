@@ -24,4 +24,14 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("register-openid.php?argument=openid", \Openclerk\Router::translate("security/register/openid"));
   }
 
+  function testGetPHPInclude() {
+    $this->assertEquals("login.php", \Openclerk\Router::getPHPInclude("login.php"));
+    $this->assertEquals("login-openid.php", \Openclerk\Router::getPHPInclude("login-openid.php?a=b&c=d"));
+  }
+
+  function testGetAdditionalParameters() {
+    $this->assertEquals(array(), \Openclerk\Router::getAdditionalParameters("login.php"));
+    $this->assertEquals(array("a" => "b", "c" => "d"), \Openclerk\Router::getAdditionalParameters("login-openid.php?a=b&c=d"));
+  }
+
 }
