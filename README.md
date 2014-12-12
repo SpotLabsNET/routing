@@ -23,7 +23,13 @@ Add a simple router file:
 
 require(__DIR__ . "/../inc/global.php");
 $path = require_get("path", "security/login/password");
-\Openclerk\Router::process($path);
+
+try {
+  \Openclerk\Router::process($path);
+} catch (\Openclerk\RouterException $e) {
+  header("HTTP/1.0 404 Not Found");
+  echo htmlspecialchars($e->getMessage());
+}
 ?>
 ```
 
@@ -31,7 +37,11 @@ Add a `.htaccess` that translates paths to this router:
 
 ```
 RewriteEngine on
-RewriteRule ^([^\.]+)$        router.php?path=$1         [L,QSA]
+
+# Forbid access to any child PHP scripts
+RewriteRule ^([^\.]+)/([^\.]+).php$   -                   [F]
+
+RewriteRule ^([^\.]+)$                router.php?path=$1  [L,QSA]```
 ```
 
 Define site routes:
@@ -39,8 +49,8 @@ Define site routes:
 ```php
 // set up routes
 \Openclerk\Router::addRoutes(array(
-  "security/login/password" => "login.php",
-  "security/login/:key" => "login-:key.php",
+  "security/login/password" => "security/login.php?type=password",
+  "security/login/:key" => "security/login-:key.php?type=:key",
   // by default any unmatched routes will require <module>.php
 ));
 ```
