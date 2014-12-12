@@ -1,0 +1,6 @@
+{
+  "name": "openclerk/routing",
+  "autoload": {
+    "files": ["functions.php"]
+  }
+}
