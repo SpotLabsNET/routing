@@ -6,6 +6,7 @@ class Router {
 
   static $routes = array();
   static $compiled_routes = null;
+  static $compiled_keys = null;
 
   static function addRoutes($routes) {
     self::$compiled_routes = null;
@@ -77,23 +78,33 @@ class Router {
 
   static $_current_compiled_value = null;
   static $_current_compiled_count = null;
+  static $_current_compiled_keys = null;
 
   static function compileRoutes() {
     $result = array();
+    $resultKeys = array();
+
     foreach (self::$routes as $key => $value) {
       $key = "#" . preg_quote($key, "#") . "#i";
       self::$_current_compiled_value = $value;
       self::$_current_compiled_count = 0;
+      self::$_current_compiled_keys = array();
 
       $key = preg_replace_callback("#\\\\:([a-z]+)#i", function ($matches) {
         Router::$_current_compiled_count++;
-        Router::$_current_compiled_value = str_replace(":" . $matches[1], "\\" . Router::$_current_compiled_count, Router::$_current_compiled_value);
+        // don't try to preg_replace Renderable objects
+        if (!is_object(Router::$_current_compiled_value)) {
+          Router::$_current_compiled_value = str_replace(":" . $matches[1], "\\" . Router::$_current_compiled_count, Router::$_current_compiled_value);
+        }
+        Router::$_current_compiled_keys[$matches[1]] = Router::$_current_compiled_count;
         return "([^/]+)";
       }, $key);
 
       $result[$key] = Router::$_current_compiled_value;
+      $resultKeys[$key] = Router::$_current_compiled_keys;
     }
     self::$compiled_routes = $result;
+    self::$compiled_keys = $resultKeys;
   }
 
   /**
@@ -106,13 +117,35 @@ class Router {
 
     foreach (self::$compiled_routes as $key => $value) {
       if (preg_match($key, $route, $matches)) {
-        for ($i = 1; $i < count($matches); $i++) {
-          $value = str_replace("\\" . $i, $matches[$i], $value);
+        if (is_object($value)) {
+          $arguments = array();
+          // get parameterised arguments
+
+          $keys = self::$compiled_keys[$key];
+          for ($i = 1; $i < count($matches); $i++) {
+            foreach ($keys as $code => $index) {
+              if ($index === $i) {
+                $arguments[$code] = $matches[$i];
+              }
+            }
+          }
+
+          return array(
+            'callback' => $value,
+            'arguments' => $arguments,
+          );
+
+        } else {
+          // don't try to parameterise Renderable objects
+          for ($i = 1; $i < count($matches); $i++) {
+            $value = str_replace("\\" . $i, $matches[$i], $value);
+          }
+          return $value;
         }
-        return $value;
       }
     }
 
+    // default
     return $route . ".php";
   }
 
@@ -139,23 +172,35 @@ class Router {
     return $result;
   }
 
+  static function getObjectParameters($path) {
+
+  }
+
   /**
    * Given the current path, find the correct PHP template,
    * set the appropriate GET variables and {@link require()} the PHP template.
    */
   static function process($path) {
     $translated = self::translate($path);
-    $include = self::getPHPInclude($translated);
-    $args = self::getAdditionalParameters($include);
+    if (is_array($translated)) {
+      $args = array_merge($translated['arguments'], $_GET);
+      $callback = $translated['callback'];
+      $callback->render($args);
 
-    if (!file_exists($include)) {
-      throw new RouterException("Could not find translated module for '$path'", new RouterException("Could not find include '$include'"));
-    }
+    } else {
+      // otherwise it's a PHP include
+      $include = self::getPHPInclude($translated);
+      $args = self::getAdditionalParameters($include);
 
-    foreach ($args as $key => $value) {
-      $_GET[$key] = $value;
+      if (!file_exists($include)) {
+        throw new RouterException("Could not find translated module for '$path'", new RouterException("Could not find include '$include'"));
+      }
+
+      foreach ($args as $key => $value) {
+        $_GET[$key] = $value;
+      }
+      require($include);
     }
-    require($include);
   }
 
 }

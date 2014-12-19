@@ -61,6 +61,23 @@ Now you can use `url_for()` and `absolute_url_for()`:
 <a href="<?php echo htmlspecialchars(url_for('security/login/password')); ?>">Login with password</a>
 ```
 
+## Renderable objects
+
+You can also pass along an object with a `render($args)` method, which will be called instead:
+
+```php
+class MyApi {
+  function render($args) {
+    // $args = array('code' => ...)
+  }
+}
+
+\Openclerk\Router::addRoutes(array(
+  "api/currency/:code" => new MyApi(),
+));
+```
+
+
 ## Tests
 
 ```php
