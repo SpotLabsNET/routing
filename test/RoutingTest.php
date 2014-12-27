@@ -80,4 +80,8 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(array("q" => "versions"), $args);
   }
 
+  function testUrlFor() {
+    $this->assertEquals("security/login/password", url_for("security/login/password"));
+  }
+
 }

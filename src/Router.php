@@ -199,6 +199,12 @@ class Router {
       foreach ($args_translated as $key => $value) {
         $_GET[$key] = $value;
       }
+
+      // TODO it would be good if we can remove this smell eventually
+      // but openclerk depends on it until we have a flash framework in place
+      global $messages;
+      global $errors;
+
       require($include);
     }
   }
