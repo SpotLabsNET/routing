@@ -5,7 +5,7 @@ A library for simple routing in PHP.
 
 ## Using
 
-This project [openclerk/config](https://github.com/openclerk/config) for config management.
+This project uses [openclerk/config](https://github.com/openclerk/config) for config management.
 
 First configure the component with site-specific values:
 
@@ -41,7 +41,7 @@ RewriteEngine on
 # Forbid access to any child PHP scripts
 RewriteRule ^([^\.]+)/([^\.]+).php$   -                   [F]
 
-RewriteRule ^([^\.]+)$                router.php?path=$1  [L,QSA]```
+RewriteRule ^([^\.]+)$                router.php?path=$1  [L,QSA]
 ```
 
 Define site routes:
