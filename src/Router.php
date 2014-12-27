@@ -172,10 +172,6 @@ class Router {
     return $result;
   }
 
-  static function getObjectParameters($path) {
-
-  }
-
   /**
    * Given the current path, find the correct PHP template,
    * set the appropriate GET variables and {@link require()} the PHP template.
@@ -190,13 +186,17 @@ class Router {
     } else {
       // otherwise it's a PHP include
       $include = self::getPHPInclude($translated);
-      $args = self::getAdditionalParameters($include);
+      $args_include = self::getAdditionalParameters($include);
+      $args_translated = self::getAdditionalParameters($translated);
 
       if (!file_exists($include)) {
         throw new RouterException("Could not find translated module for '$path'", new RouterException("Could not find include '$include'"));
       }
 
-      foreach ($args as $key => $value) {
+      foreach ($args_include as $key => $value) {
+        $_GET[$key] = $value;
+      }
+      foreach ($args_translated as $key => $value) {
         $_GET[$key] = $value;
       }
       require($include);
