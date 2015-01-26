@@ -239,7 +239,11 @@ class Router {
     // them override each other
     $new_arguments = array();
     foreach ($arguments + $previous as $key => $value) {
-      $new_arguments[$key] = $value;
+      if ($value === null) {
+        unset($new_arguments[$key]);
+      } else {
+        $new_arguments[$key] = $value;
+      }
     }
 
     foreach ($new_arguments as $key => $value) {

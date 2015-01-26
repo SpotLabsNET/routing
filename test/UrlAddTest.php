@@ -63,4 +63,20 @@ class UrlAddTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals("http://openclerk.org/url?key=foo#hash=1&key=bar", Router::urlAdd('http://openclerk.org/url?key=bar#hash=1&key=bar', array('key' => 'foo')));
   }
 
+  /**
+   * Tests that {@link Rotuer::urlAdd()} can delete keys with {@code null}.
+   */
+  function testKeyDelete() {
+    $this->assertEquals("url", Router::urlAdd('url', array('key' => null)));
+    $this->assertEquals("url", Router::urlAdd('url?key=bar', array('key' => null)));
+  }
+
+  /**
+   * Tests that {@link Rotuer::urlAdd()} can delete keys with {@code null}.
+   */
+  function testKeyDeleteAbsolute() {
+    $this->assertEquals("http://openclerk.org/url", Router::urlAdd('http://openclerk.org/url', array('key' => null)));
+    $this->assertEquals("http://openclerk.org/url", Router::urlAdd('http://openclerk.org/url?key=bar', array('key' => null)));
+  }
+
 }
