@@ -209,4 +209,50 @@ class Router {
     }
   }
 
+  /**
+   * Add GET arguments onto a particular URL. Replaces any existing arguments.
+   * Also handles #hash arguments.
+   */
+  static function urlAdd($url, $arguments = array()) {
+    $hash = false;
+    if (strpos($url, "#") !== false) {
+      $hash = substr($url, strpos($url, "#") + 1);
+      $url = substr($url, 0, strpos($url, "#"));
+    }
+
+    // strip out query
+    $previous = array();
+    if (strpos($url, "?") !== false) {
+      $query = substr($url, strpos($url, "?") + 1);
+      $url = substr($url, 0, strpos($url, "?"));
+      $bits = explode("&", $query);
+      foreach ($bits as $bit) {
+        $bit_bits = explode("=", $bit, 2);
+        // does not handle e.g. "url?foo"
+        if (count($bit_bits) == 2) {
+          $previous[urldecode($bit_bits[0])] = urldecode($bit_bits[1]);
+        }
+      }
+    }
+
+    // go through all previous arguments and new arguments, and let
+    // them override each other
+    $new_arguments = array();
+    foreach ($arguments + $previous as $key => $value) {
+      $new_arguments[$key] = $value;
+    }
+
+    foreach ($new_arguments as $key => $value) {
+      if (strpos($url, "?") !== false) {
+        $url .= "&" . urlencode($key) . "=" . urlencode($value);
+      } else {
+        $url .= "?" . urlencode($key) . "=" . urlencode($value);
+      }
+    }
+    if ($hash) {
+      $url .= "#" . $hash;
+    }
+    return $url;
+  }
+
 }
