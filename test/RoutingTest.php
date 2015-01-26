@@ -84,4 +84,9 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("security/login/password", url_for("security/login/password"));
   }
 
+  function testUrlForArguments() {
+    $this->assertEquals("security/login/password?key=foo", url_for("security/login/password", array('key' => 'foo')));
+    $this->assertEquals("security/login/password", url_for("security/login/password", array('key' => null)));
+  }
+
 }

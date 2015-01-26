@@ -38,7 +38,9 @@ class Router {
     $query = array();
     if (count($arguments) > 0) {
       foreach ($arguments as $key => $value) {
-        $query[] = urlencode($key) . "=" . urlencode($value);
+        if ($value !== null) {
+          $query[] = urlencode($key) . "=" . urlencode($value);
+        }
       }
     }
 
