@@ -87,6 +87,9 @@ class Router {
     $resultKeys = array();
 
     foreach (self::$routes as $key => $value) {
+      // strip off any leading /s
+      $key = preg_replace("/^\\/+/i", "", $key);
+
       $key = "#" . preg_quote($key, "#") . "#i";
       self::$_current_compiled_value = $value;
       self::$_current_compiled_count = 0;
@@ -192,7 +195,8 @@ class Router {
       $args_translated = self::getAdditionalParameters($translated);
 
       if (!file_exists($include)) {
-        throw new RouterException("Could not find translated module for '$path'", new RouterException("Could not find include '$include'"));
+        throw new RouterException("Could not find translated module for '$path'",
+          new RouterException("Could not find include '$include' for translated path '$translated'"));
       }
 
       foreach ($args_include as $key => $value) {
