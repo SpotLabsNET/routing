@@ -10,7 +10,24 @@ class Router {
 
   static function addRoutes($routes) {
     self::$compiled_routes = null;
-    self::$routes = array_merge(self::$routes, $routes);
+    if ($routes) {
+      self::checkForWildcardRoute();
+      self::$routes = array_merge(self::$routes, $routes);
+    }
+  }
+
+  /**
+   * Check that we don't have a wildcard route that would cause any
+   * additional added routes to be ignored.
+   * @throws RouterException if there is a wildcard route that will cause
+   *      additional routes to be ignored
+   */
+  static function checkForWildcardRoute() {
+    foreach (self::$routes as $key => $ignored) {
+      if (preg_match("/^:[a-z]+$/i", $key)) {
+        throw new RouterException("Wildcard route '$key' will prevent any additional routes from ever being reached");
+      }
+    }
   }
 
   static function resetRoutes() {
