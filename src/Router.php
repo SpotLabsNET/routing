@@ -107,10 +107,13 @@ class Router {
       // strip off any leading /s
       $key = preg_replace("/^\\/+/i", "", $key);
 
-      $key = "#" . preg_quote($key, "#") . "#i";
+      $key = "#^" . preg_quote($key, "#") . "$#i";
       self::$_current_compiled_value = $value;
       self::$_current_compiled_count = 0;
       self::$_current_compiled_keys = array();
+
+      // lots of escaping since we've already quoted them above
+      $key = preg_replace("#\\\\\\[([^\]]+)\\\\]#i", "(|\\1)", $key);
 
       $key = preg_replace_callback("#\\\\:([a-z]+)#i", function ($matches) {
         Router::$_current_compiled_count++;
@@ -130,12 +133,40 @@ class Router {
   }
 
   /**
+   * Get a list of the compiled route keys and resulting matches,
+   * only really for debugging.
+   */
+  static function getCompiledRoutes() {
+    if (self::$compiled_routes === null) {
+      self::compileRoutes();
+    }
+
+    $result = array();
+    foreach (self::$compiled_routes as $key => $value) {
+      if (is_string($value)) {
+        $result[$key] = $value;
+      } else if (is_object($value)) {
+        $result[$key] = get_class($value);
+      } else if (is_array($value)) {
+        $result[$key] = "Array";
+      } else {
+        $result[$key] = (string) $value;
+      }
+    }
+
+    return $result;
+  }
+
+  /**
    * Get the PHP file that should be included for the given route.
    */
   static function translate($route) {
     if (self::$compiled_routes === null) {
       self::compileRoutes();
     }
+
+    // strip off any leading /s
+    $route = preg_replace("/^\\/+/i", "", $route);
 
     foreach (self::$compiled_routes as $key => $value) {
       if (preg_match($key, $route, $matches)) {

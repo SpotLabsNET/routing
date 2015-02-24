@@ -30,11 +30,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
       "security/login/:key" => "login-:key.php",
       "security/register/:key" => "register-:key.php?argument=:key",
       "api/v1/currencies" => $this->empty,
-      "api/v1/currenciesArray" => array($this->empty),
       "/api/v1/currenciesAbsolute" => $this->empty,
       "api/v1/currency/:code" => $this->empty,
       "/api/v2/currencies" => "currencies2.php",
       "api/v3/currencies" => "currencies3.php",
+      "api/v4/currencies[.json]" => "currencies4.php",
       "help/:key" => "../pages/kb.php?q=:key",
     ));
   }
@@ -54,6 +54,20 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("currencies2.php", Router::translate("/api/v2/currencies"));
     $this->assertEquals("currencies3.php", Router::translate("api/v3/currencies"));
     $this->assertEquals("currencies3.php", Router::translate("/api/v3/currencies"));
+  }
+
+  /**
+   * Routes can have optional sections [foo]
+   */
+  function testOptionalTranslate() {
+    //print_r(Router::getCompiledRoutes());
+
+    $this->assertEquals("currencies4.php", Router::translate("api/v4/currencies"));
+    $this->assertEquals("currencies4.php", Router::translate("api/v4/currencies.json"));
+
+    // these don't have routes defined
+    $this->assertEquals("api/v4/currencies/nowhere.php", Router::translate("api/v4/currencies/nowhere"));
+    $this->assertEquals("api/v4/currencies.foo.php", Router::translate("api/v4/currencies.foo"));
   }
 
   function testMultipleTranslate() {
@@ -107,20 +121,11 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Routes can be added as an array as well as an object
+   * Routes can be added as an object
    */
   function testProcessObject() {
     $this->assertFalse($this->empty->rendered);
     Router::process("api/v1/currencies");
-    $this->assertTrue($this->empty->rendered);
-  }
-
-  /**
-   * Routes can be added as an array as well as an object
-   */
-  function testProcessArray() {
-    $this->assertFalse($this->empty->rendered);
-    Router::process("api/v1/currenciesArray");
     $this->assertTrue($this->empty->rendered);
   }
 
