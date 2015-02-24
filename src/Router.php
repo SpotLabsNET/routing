@@ -122,7 +122,7 @@ class Router {
           Router::$_current_compiled_value = str_replace(":" . $matches[1], "\\" . Router::$_current_compiled_count, Router::$_current_compiled_value);
         }
         Router::$_current_compiled_keys[$matches[1]] = Router::$_current_compiled_count;
-        return "([^/]+)";
+        return "([^/]+?)";
       }, $key);
 
       $result[$key] = Router::$_current_compiled_value;

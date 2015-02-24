@@ -35,6 +35,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
       "/api/v2/currencies" => "currencies2.php",
       "api/v3/currencies" => "currencies3.php",
       "api/v4/currencies[.json]" => "currencies4.php",
+      "api/v5/:key[.json]" => "currencies5.php?argument=:key",
       "help/:key" => "../pages/kb.php?q=:key",
     ));
   }
@@ -42,6 +43,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
   function testBasicTranslate() {
     $this->assertEquals("login.php", Router::translate("security/login/password"));
     $this->assertEquals("login-openid.php", Router::translate("security/login/openid"));
+    $this->assertEquals("login-open_id.php", Router::translate("security/login/open_id"));
     $this->assertEquals("default.php", Router::translate("default"));
     $this->assertEquals("default/default.php", Router::translate("default/default"));
   }
@@ -109,6 +111,28 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals("../pages/kb.php?q=versions", $translated);
     $this->assertEquals("../pages/kb.php", $include);
     $this->assertEquals(array("q" => "versions"), $args);
+  }
+
+  function testTranslateWithArguments() {
+    $path = "api/v5/btc";
+    $translated = Router::translate($path);
+    $include = Router::getPHPInclude($translated);
+    $args = Router::getAdditionalParameters($translated);
+
+    $this->assertEquals("currencies5.php?argument=btc", $translated);
+    $this->assertEquals("currencies5.php", $include);
+    $this->assertEquals(array("argument" => "btc"), $args);
+  }
+
+  function testTranslateWithArgumentsAndOptional() {
+    $path = "api/v5/btc.json";
+    $translated = Router::translate($path);
+    $include = Router::getPHPInclude($translated);
+    $args = Router::getAdditionalParameters($translated);
+
+    $this->assertEquals("currencies5.php?argument=btc", $translated);
+    $this->assertEquals("currencies5.php", $include);
+    $this->assertEquals(array("argument" => "btc"), $args);
   }
 
   function testUrlFor() {
