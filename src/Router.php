@@ -24,7 +24,7 @@ class Router {
    */
   static function checkForWildcardRoute() {
     foreach (self::$routes as $key => $ignored) {
-      if (preg_match("/^:[a-z]+$/i", $key)) {
+      if (preg_match("/^:[a-z0-9]+$/i", $key)) {
         throw new RouterException("Wildcard route '$key' will prevent any additional routes from ever being reached");
       }
     }
@@ -115,7 +115,7 @@ class Router {
       // lots of escaping since we've already quoted them above
       $key = preg_replace("#\\\\\\[([^\]]+)\\\\]#i", "(|\\1)", $key);
 
-      $key = preg_replace_callback("#\\\\:([a-z]+)#i", function ($matches) {
+      $key = preg_replace_callback("#\\\\:([a-z0-9]+)#i", function ($matches) {
         Router::$_current_compiled_count++;
         // don't try to preg_replace Renderable objects
         if (!is_object(Router::$_current_compiled_value)) {

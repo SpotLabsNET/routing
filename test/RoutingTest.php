@@ -29,6 +29,7 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
       "security/login/password" => "login.php",
       "security/login/:key" => "login-:key.php",
       "security/register/:key" => "register-:key.php?argument=:key",
+      "security/multi/:key1/:key2" => "register-:key1-:key2.php?argument=:key1&argument2=:key2",
       "api/v1/currencies" => $this->empty,
       "/api/v1/currenciesAbsolute" => $this->empty,
       "api/v1/currency/:code" => $this->empty,
@@ -74,6 +75,10 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
 
   function testMultipleTranslate() {
     $this->assertEquals("register-openid.php?argument=openid", Router::translate("security/register/openid"));
+  }
+
+  function testTranslateMultiKey() {
+    $this->assertEquals("register-foo-bar.php?argument=foo&argument2=bar", Router::translate("security/multi/foo/bar"));
   }
 
   function testGetPHPInclude() {
