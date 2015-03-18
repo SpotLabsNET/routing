@@ -1,4 +1,4 @@
-openclerk/routing
+openclerk/routing [![Build Status](https://travis-ci.org/openclerk/routing.svg)](https://travis-ci.org/openclerk/routing)
 =================
 
 A library for simple routing in PHP.
