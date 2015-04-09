@@ -50,6 +50,17 @@ class RoutingTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
+   * e.g. On CryptFolio, we have `crypto-trade` as a valid URI parameter.
+   */
+  function testHyphens() {
+    $this->assertEquals("login-open-id.php", Router::translate("security/login/open-id"));
+    $this->assertEquals("register-a-1-b-2.php?argument=a-1&argument2=b-2", Router::translate("security/multi/a-1/b-2"));
+    $this->assertEquals("default-hyphen.php", Router::translate("default-hyphen"));
+    $this->assertEquals("default/default-hyphen.php", Router::translate("default/default-hyphen"));
+    $this->assertEquals("default-hyphen/default.php", Router::translate("default-hyphen/default"));
+  }
+
+  /**
    * Routes added with a leading / can still be translated as expected
    */
   function testAbsolutePathTranslate() {
