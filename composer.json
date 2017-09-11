@@ -8,7 +8,7 @@
     }
   },
   "require": {
-    "openclerk/config": "dev-master"
+    "openclerk/config": "^0.1"
   },
   "require-dev": {
     "phpunit/phpunit": ">=4.0",
